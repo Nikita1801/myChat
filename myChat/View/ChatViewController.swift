@@ -8,6 +8,7 @@
 import UIKit
 
 protocol ChatViewControllerProtocol: AnyObject {
+    /// Getting message array
     func updateMessages(_ messages: MessageModel)
 }
 
@@ -84,6 +85,7 @@ private extension ChatViewController {
         chatPresenter?.getMessages()
     }
     
+    /// Configuring view
     func configureView() {
         view.backgroundColor = .systemGray5
         chatTableView.delegate = self
@@ -98,7 +100,7 @@ private extension ChatViewController {
         setConstraints()
     }
     
-    
+    /// Setting constraints to the view
     func setConstraints() {
         NSLayoutConstraint.activate([
             
@@ -196,6 +198,8 @@ extension ChatViewController: UITableViewDelegate, UITableViewDataSource {
         return nil
     }
     
+    /// Scroll to the very bottom, to see newest messanges
+    /// - Parameter animated: animate this scroll
     func scrollToBottom(animated: Bool) {
         DispatchQueue.main.async {
             let indexPath = IndexPath(row: self.messageArray.count-1, section: 0)
