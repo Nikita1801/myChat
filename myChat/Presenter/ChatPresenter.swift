@@ -26,7 +26,11 @@ extension ChatPresenter: ChatPresenterProtocol {
     func getMessages() {
         chatModel?.getMessages(completed: { [weak chatViewController] messages in
             DispatchQueue.main.async {
-                chatViewController?.updateMessages(messages)
+                var messageModelArray: [MessageModel] = []
+                for message in messages.result {
+                    messageModelArray.append(MessageModel(message: message, isIncoming: true))
+                }
+                chatViewController?.updateMessages(messageModelArray)
             }
         })
     }

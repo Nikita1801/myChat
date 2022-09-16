@@ -8,7 +8,7 @@
 import Foundation
 
 protocol ChatModelProtocol {
-    func getMessages(completed: @escaping (MessageModel) -> Void)
+    func getMessages(completed: @escaping (MessageData) -> Void)
 }
 
 final class ChatModel {
@@ -20,7 +20,7 @@ final class ChatModel {
 }
 
 extension ChatModel: ChatModelProtocol {
-    func getMessages(completed: @escaping (MessageModel) -> Void) {
+    func getMessages(completed: @escaping (MessageData) -> Void) {
         guard let url = URL(string: "https://numia.ru/api/getMessages?offset=0") else { return }
         network?.getData(url: url, completionHandler: completed)
     }

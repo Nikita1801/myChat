@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  ChatViewController.swift
 //  myChat
 //
 //  Created by Никита Макаревич on 14.09.2022.
@@ -9,13 +9,20 @@ import UIKit
 
 protocol ChatViewControllerProtocol: AnyObject {
     /// Getting message array
-    func updateMessages(_ messages: MessageModel)
+    func updateMessages(_ messages: [MessageModel])
+}
+
+protocol ChatViewControllerDelegate: AnyObject {
+    func didTapMessage(message: MessageModel)
 }
 
 final class ChatViewController: UIViewController {
     
+    weak var delegate: ChatViewControllerDelegate?
     private var chatPresenter: ChatPresenterProtocol?
+    private let messageViewContoller = MessageViewController()
     private var messageArray: [String] = []
+    private var messageModelArray: [MessageModel] = []
     private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard (_:)))
 
     override func viewDidLoad() {
@@ -71,6 +78,7 @@ extension ChatViewController: UITextFieldDelegate {
     /// Append send message to main array and clean textFiled line
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         messageArray.append(textField.text ?? "")
+        messageModelArray.append(MessageModel(message: textField.text ?? "", isIncoming: false))
         chatTableView.reloadData()
         scrollToBottom(animated: true)
         textField.text = ""
@@ -132,7 +140,6 @@ private extension ChatViewController {
     
     /// Configuring view by keyboard position
     func configureKeyboard() {
-        view.addGestureRecognizer(tapGesture)
         
         let willShow = UIResponder.keyboardWillShowNotification
         NotificationCenter.default.addObserver(
@@ -152,6 +159,7 @@ private extension ChatViewController {
     
     /// Get iphone's keyboard height and  move view to keyboardHeight pixels up
     @objc func keyboardWillShow(_ notification: Notification) {
+        view.addGestureRecognizer(tapGesture)
         if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
             let keyboardRectangle = keyboardFrame.cgRectValue
             let keyboardHeight = keyboardRectangle.height
@@ -161,6 +169,7 @@ private extension ChatViewController {
     
     /// Move view to original position
     @objc func keyboardWillHide(sender: NSNotification) {
+        view.removeGestureRecognizer(tapGesture)
          self.view.frame.origin.y = 0
     }
     
@@ -171,8 +180,8 @@ private extension ChatViewController {
 }
 
 extension ChatViewController: ChatViewControllerProtocol {
-    func updateMessages(_ messages: MessageModel) {
-        messageArray = (messages.result).reversed()
+    func updateMessages(_ messages: [MessageModel]) {
+        messageModelArray = messages.reversed()
         chatTableView.reloadData()
         scrollToBottom(animated: false)
     }
@@ -181,28 +190,29 @@ extension ChatViewController: ChatViewControllerProtocol {
 // MARK: - TableView extension
 extension ChatViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        messageArray.count
+        messageModelArray.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = chatTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? ChatTableViewCell else { return UITableViewCell() }
-        cell.setInfo(message: messageArray[indexPath.row])
+        let chatMessage = messageModelArray[indexPath.row]
+        cell.setInfo(message: chatMessage)
+        cell.message = chatMessage
         
         return cell
     }
     
-    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        return nil
-    }
-    func tableView(_ tableView: UITableView, willDeselectRowAt indexPath: IndexPath) -> IndexPath? {
-        return nil
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        navigationController?.present(messageViewContoller, animated: true)
+        let chatMessage = messageModelArray[indexPath.row]
+        delegate?.didTapMessage(message: chatMessage)
     }
     
     /// Scroll to the very bottom, to see newest messanges
     /// - Parameter animated: animate this scroll
     func scrollToBottom(animated: Bool) {
         DispatchQueue.main.async {
-            let indexPath = IndexPath(row: self.messageArray.count-1, section: 0)
+            let indexPath = IndexPath(row: self.messageModelArray.count-1, section: 0)
             self.chatTableView.scrollToRow(at: indexPath, at: .bottom, animated: animated)
         }
     }
