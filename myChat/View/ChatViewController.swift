@@ -21,7 +21,6 @@ final class ChatViewController: UIViewController {
     weak var delegate: ChatViewControllerDelegate?
     private var chatPresenter: ChatPresenterProtocol?
     private let messageViewContoller = MessageViewController()
-    private var messageArray: [String] = []
     private var messageModelArray: [MessageModel] = []
     private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard (_:)))
 
@@ -77,7 +76,6 @@ extension ChatViewController: UITextFieldDelegate {
     
     /// Append send message to main array and clean textFiled line
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        messageArray.append(textField.text ?? "")
         messageModelArray.append(MessageModel(message: textField.text ?? "", isIncoming: false))
         chatTableView.reloadData()
         scrollToBottom(animated: true)
