@@ -57,12 +57,14 @@ final class ChatTableViewCell: UITableViewCell {
         return bubbleView
     }()
     
+    /// setting info to cell's UI elements
     func setInfo(message: MessageModel) {
         messageBody.text = message.message
     }
 }
 
 private extension ChatTableViewCell {
+    /// configuring view
     func configureView() {
         addSubview(bubbleBackgroundView)
         addSubview(messageBody)
@@ -70,6 +72,7 @@ private extension ChatTableViewCell {
         setConstraints()
     }
     
+    /// setting constraints
     func setConstraints() {
         NSLayoutConstraint.activate([
             messageBody.topAnchor.constraint(equalTo: topAnchor, constant: 20),
