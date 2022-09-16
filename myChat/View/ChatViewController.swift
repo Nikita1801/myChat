@@ -20,9 +20,10 @@ final class ChatViewController: UIViewController {
     
     weak var delegate: ChatViewControllerDelegate?
     private var chatPresenter: ChatPresenterProtocol?
-    private let messageViewContoller = MessageViewController()
+//    private let messageViewContoller = MessageViewController()
     private var messageModelArray: [MessageModel] = []
     private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard (_:)))
+    private let outcomeImageURL = "https://e7.pngegg.com/pngimages/674/524/png-clipart-professional-computer-icons-avatar-job-avatar-heroes-computer.png"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -76,7 +77,7 @@ extension ChatViewController: UITextFieldDelegate {
     
     /// Append send message to main array and clean textFiled line
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        messageModelArray.append(MessageModel(message: textField.text ?? "", isIncoming: false))
+        messageModelArray.append(MessageModel(message: textField.text ?? "", photoURL: outcomeImageURL, isIncoming: false))
         chatTableView.reloadData()
         scrollToBottom(animated: true)
         textField.text = ""
@@ -201,7 +202,7 @@ extension ChatViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        navigationController?.present(messageViewContoller, animated: true)
+//        navigationController?.present(messageViewContoller, animated: true)
         let chatMessage = messageModelArray[indexPath.row]
         delegate?.didTapMessage(message: chatMessage)
     }

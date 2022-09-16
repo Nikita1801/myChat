@@ -9,8 +9,8 @@ import UIKit
 
 final class ChatTableViewCell: UITableViewCell {
     
-    private var leadingConstraint: NSLayoutConstraint!
-    private var trailingConstraint: NSLayoutConstraint!
+    private var incomeMessageConstraint: [NSLayoutConstraint]!
+    private var outcomeMessageConstraint: [NSLayoutConstraint]!
     
     var message: MessageModel! {
         didSet {
@@ -18,16 +18,16 @@ final class ChatTableViewCell: UITableViewCell {
             messageBody.textColor = message.isIncoming ? UIColor(named: "textColor") : .white
             
             if message.isIncoming {
-                leadingConstraint.isActive = true
-                trailingConstraint.isActive = false
+                NSLayoutConstraint.activate(incomeMessageConstraint)
+                NSLayoutConstraint.deactivate(outcomeMessageConstraint)
             }
             else {
-                leadingConstraint.isActive = false
-                trailingConstraint.isActive = true
+                NSLayoutConstraint.activate(outcomeMessageConstraint)
+                NSLayoutConstraint.deactivate(incomeMessageConstraint)
             }
         }
     }
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         backgroundColor = .clear
@@ -37,6 +37,17 @@ final class ChatTableViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    private let photoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.layer.borderWidth = 1
+        imageView.layer.borderColor = UIColor.white.cgColor
+        imageView.layer.cornerRadius = 15
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.masksToBounds = true
+        
+        return imageView
+    }()
     
     private let messageBody: UILabel = {
         let label = UILabel()
@@ -60,14 +71,33 @@ final class ChatTableViewCell: UITableViewCell {
     /// setting info to cell's UI elements
     func setInfo(message: MessageModel) {
         messageBody.text = message.message
+        getImage(imageURL: message.photoURL, imageView: photoImageView)
     }
 }
 
+// MARK: - Loading image extension
+private extension ChatTableViewCell {
+    func getImage(imageURL: String, imageView: UIImageView) {
+        if let url = URL(string: imageURL) {
+            let task = URLSession.shared.dataTask(with: url) { data, response, error in
+                guard let data = data, error == nil else { return }
+                
+                DispatchQueue.main.async {
+                    imageView.image = UIImage(data: data)
+                }
+            }
+            task.resume()
+        }
+    }
+}
+
+// MARK: - Configuring UI extension
 private extension ChatTableViewCell {
     /// configuring view
     func configureView() {
         addSubview(bubbleBackgroundView)
         addSubview(messageBody)
+        addSubview(photoImageView)
         
         setConstraints()
     }
@@ -75,8 +105,12 @@ private extension ChatTableViewCell {
     /// setting constraints
     func setConstraints() {
         NSLayoutConstraint.activate([
-            messageBody.topAnchor.constraint(equalTo: topAnchor, constant: 20),
             
+            photoImageView.heightAnchor.constraint(equalToConstant: 30),
+            photoImageView.widthAnchor.constraint(equalToConstant: 30),
+            photoImageView.bottomAnchor.constraint(equalTo: bubbleBackgroundView.bottomAnchor),
+            
+            messageBody.topAnchor.constraint(equalTo: topAnchor, constant: 20),
             messageBody.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -20),
             messageBody.widthAnchor.constraint(lessThanOrEqualToConstant: 250),
             
@@ -87,10 +121,14 @@ private extension ChatTableViewCell {
             
         ])
         
-        leadingConstraint = messageBody.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 30)
-        leadingConstraint.isActive = false
+        incomeMessageConstraint = [
+            messageBody.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 60),
+            photoImageView.trailingAnchor.constraint(equalTo: bubbleBackgroundView.leadingAnchor, constant: -5)
+        ]
         
-        trailingConstraint = messageBody.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30)
-        trailingConstraint.isActive = false
+        outcomeMessageConstraint = [
+            messageBody.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -60),
+            photoImageView.leadingAnchor.constraint(equalTo: bubbleBackgroundView.trailingAnchor, constant: 5)
+        ]
     }
 }

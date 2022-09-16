@@ -9,5 +9,6 @@ import Foundation
 
 struct MessageModel {
     let message: String
+    let photoURL: String
     let isIncoming: Bool
 }
