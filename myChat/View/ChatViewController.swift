@@ -10,20 +10,27 @@ import UIKit
 protocol ChatViewControllerProtocol: AnyObject {
     /// Getting message array
     func updateMessages(_ messages: [MessageModel])
+    
 }
 
 protocol ChatViewControllerDelegate: AnyObject {
-    func didTapMessage(message: MessageModel)
+//    func removeMessage(_ message: MessageModel)
+    func removeMessage()
 }
+
 
 final class ChatViewController: UIViewController {
     
-    weak var delegate: ChatViewControllerDelegate?
     private var chatPresenter: ChatPresenterProtocol?
-//    private let messageViewContoller = MessageViewController()
+    private lazy var messageViewContoller: MessageViewControllerDelegate = {
+        let message = MessageViewController()
+        message.delegate = self
+        return message
+    }()
     private var messageModelArray: [MessageModel] = []
     private lazy var tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard (_:)))
     private let outcomeImageURL = "https://e7.pngegg.com/pngimages/674/524/png-clipart-professional-computer-icons-avatar-job-avatar-heroes-computer.png"
+    private var messageIndex = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -134,6 +141,13 @@ private extension ChatViewController {
     }
 }
 
+extension ChatViewController: ChatViewControllerDelegate {
+    func removeMessage() {
+        messageModelArray.remove(at: messageIndex)
+        chatTableView.reloadData()
+    }
+}
+
 // MARK: - Keyboard Configuration
 private extension ChatViewController {
     
@@ -202,9 +216,10 @@ extension ChatViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        navigationController?.present(messageViewContoller, animated: true)
+        navigationController?.present(messageViewContoller, animated: true)
+        messageIndex = indexPath.row
         let chatMessage = messageModelArray[indexPath.row]
-        delegate?.didTapMessage(message: chatMessage)
+        messageViewContoller.didTapMessage(message: chatMessage)
     }
     
     /// Scroll to the very bottom, to see newest messanges

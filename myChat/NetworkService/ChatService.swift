@@ -15,9 +15,10 @@ final class NetworkService: NetworkServiceProtocol {
     
     func getData(url: URL, completionHandler: @escaping (MessageData) -> Void) {
         
-        getRequest(url: url) { data in
+        getRequest(url: url) { [weak self] data in
             guard let model = try? JSONDecoder().decode(MessageData.self, from: data)
             else {
+                self?.getData(url: url, completionHandler: completionHandler)
                 print("Error while parsing")
                 return
             }

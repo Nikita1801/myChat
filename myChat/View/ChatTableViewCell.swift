@@ -9,8 +9,8 @@ import UIKit
 
 final class ChatTableViewCell: UITableViewCell {
     
-    private var incomeMessageConstraint: [NSLayoutConstraint]!
-    private var outcomeMessageConstraint: [NSLayoutConstraint]!
+    private var incomeMessageConstraint: [NSLayoutConstraint] = []
+    private var outcomeMessageConstraint: [NSLayoutConstraint] = []
     
     var message: MessageModel! {
         didSet {

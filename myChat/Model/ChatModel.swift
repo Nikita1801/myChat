@@ -21,7 +21,7 @@ final class ChatModel {
 
 extension ChatModel: ChatModelProtocol {
     func getMessages(completed: @escaping (MessageData) -> Void) {
-        guard let url = URL(string: "https://numia.ru/api/getMessages?offset=0") else { return }
+        guard let url = URL(string: "https://numia.ru/api/getMessages?offset=20") else { return }
         network?.getData(url: url, completionHandler: completed)
     }
 }
