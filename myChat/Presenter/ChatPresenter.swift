@@ -24,7 +24,9 @@ final class ChatPresenter {
 }
 
 extension ChatPresenter: ChatPresenterProtocol {
+    
     func getMessages() {
+
         chatModel?.getMessages(completed: { [weak chatViewController] messages in
             DispatchQueue.main.async {
                 var messageModelArray: [MessageModel] = []

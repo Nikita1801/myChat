@@ -14,12 +14,42 @@ protocol MessageViewControllerDelegate: UIViewController {
 final class MessageViewController: UIViewController {
     
     weak var delegate: ChatViewControllerDelegate?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         configureView()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        UIView.animate(withDuration: 1, delay: 0) {
+            self.photoImageView.alpha = 1
+            self.messageBodyLabel.alpha = 1
+            self.timeLabel.alpha = 1
+            self.deleteButton.alpha = 1
+            self.bubbleBackgroundView.alpha = 1
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        photoImageView.alpha = 0
+        messageBodyLabel.alpha = 0
+        timeLabel.alpha = 0
+        deleteButton.alpha = 0
+        bubbleBackgroundView.alpha = 0
+    }
+    
+    private lazy var dismissButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Назад", for: .normal)
+        button.setTitleColor(UIColor.systemBlue, for: .normal)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 15)
+        button.backgroundColor = UIColor.systemGray5
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(didTapDismissButton), for: .touchUpInside)
+        
+        return button
+    }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -32,6 +62,7 @@ final class MessageViewController: UIViewController {
     
     private let photoImageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.alpha = 0
         imageView.layer.borderWidth = 3
         imageView.layer.borderColor = UIColor.white.cgColor
         imageView.layer.cornerRadius = 50
@@ -43,6 +74,7 @@ final class MessageViewController: UIViewController {
     
     private let messageBodyLabel: UILabel = {
         let label = UILabel()
+        label.alpha = 0
         label.font = UIFont.systemFont(ofSize: 16)
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -52,6 +84,7 @@ final class MessageViewController: UIViewController {
     
     private let timeLabel: UILabel = {
         let label = UILabel()
+        label.alpha = 0
         label.text = "14:00"
         label.font = UIFont.systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +94,8 @@ final class MessageViewController: UIViewController {
     
     private lazy var deleteButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Delete message", for: .normal)
+        button.alpha = 0
+        button.setTitle("Удалить сообщение", for: .normal)
         button.titleLabel?.textColor = UIColor.white
         button.backgroundColor = UIColor.systemRed
         button.layer.cornerRadius = 10
@@ -73,6 +107,7 @@ final class MessageViewController: UIViewController {
     
     private let bubbleBackgroundView: UIView = {
         let bubbleView = UIView()
+        bubbleView.alpha = 0
         bubbleView.backgroundColor = UIColor(named: "bubble")
         bubbleView.layer.cornerRadius = 10
         bubbleView.translatesAutoresizingMaskIntoConstraints = false
@@ -92,13 +127,20 @@ final class MessageViewController: UIViewController {
         dismiss(animated: true)
         delegate?.removeMessage()
     }
+    
+    @objc private func didTapDismissButton() {
+        dismiss(animated: true)
+    }
+    
 }
 
 private extension MessageViewController {
     func configureView() {
         view.backgroundColor = UIColor.systemGray5
+        
         view.addSubview(backgroundImage)
         view.addSubview(bubbleBackgroundView)
+        view.addSubview(dismissButton)
         view.addSubview(titleLabel)
         view.addSubview(photoImageView)
         view.addSubview(messageBodyLabel)
@@ -124,6 +166,9 @@ private extension MessageViewController {
             titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 15),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
+            dismissButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
+            dismissButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            
             photoImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 50),
             photoImageView.widthAnchor.constraint(equalToConstant: 100),
             photoImageView.heightAnchor.constraint(equalToConstant: 100),
@@ -135,7 +180,7 @@ private extension MessageViewController {
             
             timeLabel.trailingAnchor.constraint(equalTo: bubbleBackgroundView.trailingAnchor, constant: -10),
             timeLabel.bottomAnchor.constraint(equalTo: bubbleBackgroundView.bottomAnchor, constant: -7),
-
+            
             deleteButton.topAnchor.constraint(equalTo: messageBodyLabel.bottomAnchor, constant: 40),
             deleteButton.leadingAnchor.constraint(equalTo: bubbleBackgroundView.leadingAnchor),
             deleteButton.trailingAnchor.constraint(equalTo: bubbleBackgroundView.trailingAnchor),
