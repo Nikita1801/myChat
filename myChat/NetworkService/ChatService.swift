@@ -8,17 +8,18 @@
 import Foundation
 
 protocol NetworkServiceProtocol {
-    func getData(url: URL, completionHandler: @escaping (MessageData) -> Void)
+    func getData(url: URL, completionHandler: @escaping (MessageData?) -> Void)
 }
 
 final class NetworkService: NetworkServiceProtocol {
     
-    func getData(url: URL, completionHandler: @escaping (MessageData) -> Void) {
+    func getData(url: URL, completionHandler: @escaping (MessageData?) -> Void) {
         
         getRequest(url: url) { [weak self] data in
             guard let model = try? JSONDecoder().decode(MessageData.self, from: data)
             else {
-                self?.getData(url: url, completionHandler: completionHandler)
+//                self?.getData(url: url, completionHandler: completionHandler)
+                completionHandler(nil)
                 print("Error while parsing")
                 return
             }

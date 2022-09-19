@@ -8,7 +8,8 @@
 import Foundation
 
 protocol ChatModelProtocol {
-    func getMessages(completed: @escaping (MessageData) -> Void)
+    /// getting messages by API Call
+    func getMessages(isLastRequestSuccessful: Bool ,completed: @escaping (MessageData?) -> Void)
 }
 
 final class ChatModel {
@@ -19,6 +20,7 @@ final class ChatModel {
         self.network = network
     }
     
+    /// configuring URL by appending offset
     private func generateNewURL(offset: Int) -> String {
         let baseURL = "https://numia.ru/api/getMessages?offset="
         let url = baseURL + String(offset + 20)
@@ -28,7 +30,10 @@ final class ChatModel {
 }
 
 extension ChatModel: ChatModelProtocol {
-    func getMessages(completed: @escaping (MessageData) -> Void) {
+    func getMessages(isLastRequestSuccessful: Bool, completed: @escaping (MessageData?) -> Void) {
+        if !isLastRequestSuccessful {
+            offset -= 20
+        }
         guard let url = URL(string: generateNewURL(offset: offset)) else { return }
         network?.getData(url: url, completionHandler: completed)
         offset += 20

@@ -8,7 +8,8 @@
 import Foundation
 
 protocol ChatPresenterProtocol {
-    func getMessages()
+    /// call Model to make API request
+    func getMessages(isLastRequestSuccessful: Bool)
 }
 
 final class ChatPresenter {
@@ -25,12 +26,15 @@ final class ChatPresenter {
 
 extension ChatPresenter: ChatPresenterProtocol {
     
-    func getMessages() {
-
-        chatModel?.getMessages(completed: { [weak chatViewController] messages in
+    func getMessages(isLastRequestSuccessful: Bool) {
+        chatModel?.getMessages(isLastRequestSuccessful: isLastRequestSuccessful, completed: { [weak chatViewController] messages in
             DispatchQueue.main.async {
                 var messageModelArray: [MessageModel] = []
-                for message in messages.result {
+                guard let messages = messages?.result else {
+                    chatViewController?.updateMessages(nil)
+                    return
+                }
+                for message in messages {
                     messageModelArray.append(MessageModel(message: message, photoURL: self.incomeImageURL, isIncoming: true))
                 }
                 chatViewController?.updateMessages(messageModelArray)

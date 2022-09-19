@@ -9,7 +9,7 @@ import UIKit
 
 protocol ChatViewControllerProtocol: AnyObject {
     /// Getting message array
-    func updateMessages(_ messages: [MessageModel])
+    func updateMessages(_ messages: [MessageModel]?)
     
 }
 
@@ -97,7 +97,7 @@ extension ChatViewController: UITextFieldDelegate {
 private extension ChatViewController {
     /// getting messages from server by API call
     func getMessages() {
-        chatPresenter?.getMessages()
+        chatPresenter?.getMessages(isLastRequestSuccessful: true)
     }
     
     /// Configuring view
@@ -151,6 +151,20 @@ private extension ChatViewController {
         
         return view
     }
+    
+    func showAlert() {
+        
+        // create the alert
+        let alert = UIAlertController(title: "Ошибка при загрузке", message: "Желаете повторить загрузку?", preferredStyle: UIAlertController.Style.alert)
+        
+        // add the actions (buttons)
+        alert.addAction(UIAlertAction(title: "Повтроить загрузку", style: UIAlertAction.Style.default, handler: { _ in
+            self.chatPresenter?.getMessages(isLastRequestSuccessful: false)
+        } ))
+        alert.addAction(UIAlertAction(title: "Закрыть", style: UIAlertAction.Style.cancel, handler: nil))
+        // show the alert
+        self.present(alert, animated: true, completion: nil)
+    }
 }
 
 extension ChatViewController: ChatViewControllerDelegate {
@@ -162,7 +176,11 @@ extension ChatViewController: ChatViewControllerDelegate {
 }
 
 extension ChatViewController: ChatViewControllerProtocol {
-    func updateMessages(_ messages: [MessageModel]) {
+    func updateMessages(_ messages: [MessageModel]?) {
+        guard let messages = messages else {
+            showAlert()
+            return
+        }
         for message in messages {
             messageModelArray.insert(message, at: 0)
         }
@@ -195,10 +213,9 @@ extension ChatViewController: UIScrollViewDelegate {
         let position = scrollView.contentOffset.y
         if position < -20 {
             if !fetchingMoreData {
-                print("loading")
                 chatTableView.tableHeaderView = createSpinner()
                 fetchingMoreData = true
-                chatPresenter?.getMessages()
+                chatPresenter?.getMessages(isLastRequestSuccessful: true)
             }
         }
     }
