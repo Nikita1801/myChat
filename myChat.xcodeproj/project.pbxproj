@@ -17,6 +17,8 @@
 		A70C836C28D20449004D9DB6 /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70C836B28D20449004D9DB6 /* ChatService.swift */; };
 		A70C836E28D205DD004D9DB6 /* MessageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A70C836D28D205DD004D9DB6 /* MessageData.swift */; };
 		A744368F28D49BE30064F922 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A744368E28D49BE30064F922 /* MessageViewController.swift */; };
+		A744369828D8D9190064F922 /* ChatModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A744369628D8D9190064F922 /* ChatModel.xcdatamodeld */; };
+		A744369A28D8E09D0064F922 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A744369928D8E09D0064F922 /* DataManager.swift */; };
 		A7A8B59228D35AD0006A385C /* MessageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A8B59128D35AD0006A385C /* MessageModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +35,8 @@
 		A70C836B28D20449004D9DB6 /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
 		A70C836D28D205DD004D9DB6 /* MessageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageData.swift; sourceTree = "<group>"; };
 		A744368E28D49BE30064F922 /* MessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
+		A744369728D8D9190064F922 /* ChatModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ChatModel.xcdatamodel; sourceTree = "<group>"; };
+		A744369928D8E09D0064F922 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		A7A8B59128D35AD0006A385C /* MessageModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -74,6 +78,8 @@
 				A70C836528D203DD004D9DB6 /* Presenter */,
 				A70C835828D20298004D9DB6 /* Assets.xcassets */,
 				A70C835D28D20298004D9DB6 /* Info.plist */,
+				A744369628D8D9190064F922 /* ChatModel.xcdatamodeld */,
+				A744369928D8E09D0064F922 /* DataManager.swift */,
 			);
 			path = myChat;
 			sourceTree = "<group>";
@@ -186,10 +192,12 @@
 				A70C836928D2041C004D9DB6 /* ChatModel.swift in Sources */,
 				A70C835428D20296004D9DB6 /* ChatViewController.swift in Sources */,
 				A70C836E28D205DD004D9DB6 /* MessageData.swift in Sources */,
+				A744369A28D8E09D0064F922 /* DataManager.swift in Sources */,
 				A70C835028D20296004D9DB6 /* AppDelegate.swift in Sources */,
 				A744368F28D49BE30064F922 /* MessageViewController.swift in Sources */,
 				A70C836728D20411004D9DB6 /* ChatPresenter.swift in Sources */,
 				A70B3CC428D23C0500435442 /* ChatTableViewCell.swift in Sources */,
+				A744369828D8D9190064F922 /* ChatModel.xcdatamodeld in Sources */,
 				A70C835228D20296004D9DB6 /* SceneDelegate.swift in Sources */,
 				A7A8B59228D35AD0006A385C /* MessageModel.swift in Sources */,
 				A70C836C28D20449004D9DB6 /* ChatService.swift in Sources */,
@@ -389,6 +397,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		A744369628D8D9190064F922 /* ChatModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				A744369728D8D9190064F922 /* ChatModel.xcdatamodel */,
+			);
+			currentVersion = A744369728D8D9190064F922 /* ChatModel.xcdatamodel */;
+			path = ChatModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = A70C834428D20296004D9DB6 /* Project object */;
 }

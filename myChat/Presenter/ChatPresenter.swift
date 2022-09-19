@@ -8,10 +8,14 @@
 import Foundation
 
 protocol ChatPresenterProtocol {
-    /// call Model to make API request
+    /// Call Model to make API request
     func getMessages(isLastRequestSuccessful: Bool)
-    
-    func saveOutcomeMessages(messages: [MessageModel])
+    /// Save messages to CoreData when user write new message
+    func saveOutcomeMessages(message: MessageModel)
+    /// Fetching for outcome messages from CoreData
+    func fetchOutcomeMessages() -> [MessageModel]
+    /// Deleting outcome message when deleted on the ChatViewController()
+    func deleteOutcomeMessage(message: MessageModel)
 }
 
 final class ChatPresenter {
@@ -27,12 +31,25 @@ final class ChatPresenter {
 }
 
 extension ChatPresenter: ChatPresenterProtocol {
-    func saveOutcomeMessages(messages: [MessageModel]) {
-        let outcomeMessagesArray = messages.filter { $0.isIncoming == false }
-        print("saving: \(outcomeMessagesArray)")
-        print("SAVEEE________________")
+    
+    func fetchOutcomeMessages() -> [MessageModel] {
+        var messageModelArray: [MessageModel] = []
+        let messages = DataManager.shared.fetchMessages()
+        for message in messages {
+            messageModelArray.append(MessageModel(message: message.message ?? "", photoURL: message.photoURL ?? "", isIncoming: message.isIncoming))
+        }
+
+        return messageModelArray
     }
     
+    func saveOutcomeMessages(message: MessageModel) {
+        DataManager.shared.settingMessage(messageBody: message.message, isIncomming: message.isIncoming, photoURL: message.photoURL)
+        DataManager.shared.saveContext()
+    }
+    
+    func deleteOutcomeMessage(message: MessageModel) {
+        DataManager.shared.delete(message: message)
+    }
     
     func getMessages(isLastRequestSuccessful: Bool) {
         chatModel?.getMessages(isLastRequestSuccessful: isLastRequestSuccessful, completed: { [weak chatViewController] messages in

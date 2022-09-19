@@ -16,6 +16,7 @@ protocol MessageViewControllerDelegate: UIViewController {
 final class MessageViewController: UIViewController {
     
     weak var delegate: ChatViewControllerDelegate?
+    private var messageInfo: MessageModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -128,14 +129,14 @@ final class MessageViewController: UIViewController {
     /// Removing message and dismissing MessageViewController
     @objc private func didTapRemoveMessage() {
         dismiss(animated: true)
-        delegate?.removeMessage()
+        guard let messageInfo = messageInfo else { return }
+        delegate?.removeMessage(message: messageInfo)
     }
     
     /// Dismissing MessageViewController
     @objc private func didTapDismissButton() {
         dismiss(animated: true)
     }
-    
 }
 
 private extension MessageViewController {
@@ -220,5 +221,6 @@ extension MessageViewController: MessageViewControllerDelegate {
         timeLabel.textColor = message.isIncoming ? UIColor(named: "textColor") : .white
         bubbleBackgroundView.backgroundColor = message.isIncoming ? UIColor(named: "bubble") : UIColor(named: "outcomeBubble")
         getImage(imageURL: message.photoURL, imageView: photoImageView)
+        messageInfo = message
     }
 }

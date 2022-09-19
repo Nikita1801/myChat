@@ -15,7 +15,7 @@ protocol ChatViewControllerProtocol: AnyObject {
 
 protocol ChatViewControllerDelegate: AnyObject {
     /// remove message from message list
-    func removeMessage()
+    func removeMessage(message: MessageModel)
 }
 
 
@@ -37,10 +37,16 @@ final class ChatViewController: UIViewController {
         super.viewDidLoad()
         
         chatPresenter = ChatPresenter(chatViewController: self)
-        getMessages()
+        let outcomeMessages = chatPresenter?.fetchOutcomeMessages()
+        guard let outcomeMessages = outcomeMessages else { return }
+        for message in outcomeMessages  {
+            messageModelArray.append(message)
+        }
         
+        getMessages()
         configureView()
     }
+
     
     private let headerLabel: UILabel = {
         let label = UILabel()
@@ -85,13 +91,14 @@ extension ChatViewController: UITextFieldDelegate {
     
     /// Append send message to main array and clean textFiled line
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        messageModelArray.append(MessageModel(message: textField.text ?? "", photoURL: outcomeImageURL, isIncoming: false))
+        let outcomeMessage = MessageModel(message: textField.text ?? "", photoURL: outcomeImageURL, isIncoming: false)
+        messageModelArray.append(outcomeMessage)
         chatTableView.reloadData()
         scrollToBottom(animated: true, indexPath: messageModelArray.count-1)
         textField.text = ""
         
         // send data to presenter to save into CoreData
-        chatPresenter?.saveOutcomeMessages(messages: messageModelArray)
+        chatPresenter?.saveOutcomeMessages(message: outcomeMessage)
         
         return true
     }
@@ -156,8 +163,8 @@ private extension ChatViewController {
         return view
     }
     
+    /// Show alert when getting error from the server
     func showAlert() {
-        
         // create the alert
         let alert = UIAlertController(title: "Ошибка при загрузке", message: "Желаете повторить загрузку?", preferredStyle: UIAlertController.Style.alert)
         
@@ -171,14 +178,17 @@ private extension ChatViewController {
     }
 }
 
+// MARK: - ChatViewControllerDelegate extension (Deleating message)
 extension ChatViewController: ChatViewControllerDelegate {
     /// remove message by messageIndex and reloading data
-    func removeMessage() {
+    func removeMessage(message: MessageModel) {
         messageModelArray.remove(at: messageIndex)
+        chatPresenter?.deleteOutcomeMessage(message: message)
         chatTableView.reloadData()
     }
 }
 
+// MARK: - ChatViewControllerProtocol extension
 extension ChatViewController: ChatViewControllerProtocol {
     func updateMessages(_ messages: [MessageModel]?) {
         guard let messages = messages else {
@@ -190,7 +200,7 @@ extension ChatViewController: ChatViewControllerProtocol {
         }
         
         chatTableView.tableHeaderView = nil
-        if fetchingMoreData && messages.count != 0 {
+        if fetchingMoreData && messages.count != 0 && messageModelArray.count > 28 {
             chatTableView.reloadData()
             
             UIView.transition(with: chatTableView,
@@ -206,7 +216,7 @@ extension ChatViewController: ChatViewControllerProtocol {
             UIView.transition(with: chatTableView,
                               duration: 0.25,
                               options: .transitionCrossDissolve,
-                              animations: { self.scrollToBottom(animated: false, indexPath: 19) })
+                              animations: { self.scrollToBottom(animated: false, indexPath: self.messageModelArray.count-1) })
         }
     }
 }
