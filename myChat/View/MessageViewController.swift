@@ -8,6 +8,8 @@
 import UIKit
 
 protocol MessageViewControllerDelegate: UIViewController {
+    /// open message details on new screen
+    /// - Parameter message: current message
     func didTapMessage(message: MessageModel)
 }
 
@@ -123,11 +125,13 @@ final class MessageViewController: UIViewController {
         return imageView
     }()
     
+    /// Removing message and dismissing MessageViewController
     @objc private func didTapRemoveMessage() {
         dismiss(animated: true)
         delegate?.removeMessage()
     }
     
+    /// Dismissing MessageViewController
     @objc private func didTapDismissButton() {
         dismiss(animated: true)
     }
@@ -135,6 +139,7 @@ final class MessageViewController: UIViewController {
 }
 
 private extension MessageViewController {
+    /// Configuring View and calling to set constraints
     func configureView() {
         view.backgroundColor = UIColor.systemGray5
         
@@ -150,6 +155,7 @@ private extension MessageViewController {
         setConstraints()
     }
     
+    /// Setting constraints
     func setConstraints() {
         NSLayoutConstraint.activate([
             

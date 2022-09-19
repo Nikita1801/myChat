@@ -14,7 +14,7 @@ protocol ChatViewControllerProtocol: AnyObject {
 }
 
 protocol ChatViewControllerDelegate: AnyObject {
-    //    func removeMessage(_ message: MessageModel)
+    /// remove message from message list
     func removeMessage()
 }
 
@@ -141,6 +141,7 @@ private extension ChatViewController {
         ])
     }
     
+    /// Creating spinner for loading animation
     func createSpinner() -> UIView {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 100))
         let spinner = UIActivityIndicatorView()
@@ -153,6 +154,7 @@ private extension ChatViewController {
 }
 
 extension ChatViewController: ChatViewControllerDelegate {
+    /// remove message by messageIndex and reloading data
     func removeMessage() {
         messageModelArray.remove(at: messageIndex)
         chatTableView.reloadData()
@@ -170,9 +172,12 @@ extension ChatViewController: ChatViewControllerProtocol {
             chatTableView.reloadData()
             
             UIView.transition(with: chatTableView,
-                              duration: 0.5,
+                              duration: 1,
                               options: .transitionCrossDissolve,
                               animations: { self.scrollToBottom(animated: false, indexPath: 28) })
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                self.fetchingMoreData = false
+            }
         }
         else if !fetchingMoreData && messages.count != 0 {
             chatTableView.reloadData()
@@ -181,16 +186,16 @@ extension ChatViewController: ChatViewControllerProtocol {
                               options: .transitionCrossDissolve,
                               animations: { self.scrollToBottom(animated: false, indexPath: 19) })
         }
-        fetchingMoreData = false
-        
     }
 }
 
 extension ChatViewController: UIScrollViewDelegate {
+    /// Detect end of message list and request more data
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let position = scrollView.contentOffset.y
         if position < -20 {
             if !fetchingMoreData {
+                print("loading")
                 chatTableView.tableHeaderView = createSpinner()
                 fetchingMoreData = true
                 chatPresenter?.getMessages()
