@@ -10,6 +10,8 @@ import Foundation
 protocol ChatPresenterProtocol {
     /// call Model to make API request
     func getMessages(isLastRequestSuccessful: Bool)
+    
+    func saveOutcomeMessages(messages: [MessageModel])
 }
 
 final class ChatPresenter {
@@ -25,6 +27,12 @@ final class ChatPresenter {
 }
 
 extension ChatPresenter: ChatPresenterProtocol {
+    func saveOutcomeMessages(messages: [MessageModel]) {
+        let outcomeMessagesArray = messages.filter { $0.isIncoming == false }
+        print("saving: \(outcomeMessagesArray)")
+        print("SAVEEE________________")
+    }
+    
     
     func getMessages(isLastRequestSuccessful: Bool) {
         chatModel?.getMessages(isLastRequestSuccessful: isLastRequestSuccessful, completed: { [weak chatViewController] messages in

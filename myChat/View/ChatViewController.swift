@@ -89,6 +89,10 @@ extension ChatViewController: UITextFieldDelegate {
         chatTableView.reloadData()
         scrollToBottom(animated: true, indexPath: messageModelArray.count-1)
         textField.text = ""
+        
+        // send data to presenter to save into CoreData
+        chatPresenter?.saveOutcomeMessages(messages: messageModelArray)
+        
         return true
     }
 }
