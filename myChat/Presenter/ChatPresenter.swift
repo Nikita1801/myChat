@@ -35,15 +35,18 @@ extension ChatPresenter: ChatPresenterProtocol {
     func fetchOutcomeMessages() -> [MessageModel] {
         var messageModelArray: [MessageModel] = []
         let messages = DataManager.shared.fetchMessages()
-        for message in messages {
-            messageModelArray.append(MessageModel(message: message.message ?? "", photoURL: message.photoURL ?? "", isIncoming: message.isIncoming))
-        }
-
+        
+        messages.forEach { message in
+            messageModelArray.append(MessageModel(message: message.message ?? "",
+                                                  photoURL: message.photoURL ?? "",
+                                                  isIncoming: message.isIncoming))}
         return messageModelArray
     }
     
     func saveOutcomeMessages(message: MessageModel) {
-        DataManager.shared.settingMessage(messageBody: message.message, isIncomming: message.isIncoming, photoURL: message.photoURL)
+        DataManager.shared.settingMessage(messageBody: message.message,
+                                          isIncomming: message.isIncoming,
+                                          photoURL: message.photoURL)
         DataManager.shared.saveContext()
     }
     
@@ -52,7 +55,7 @@ extension ChatPresenter: ChatPresenterProtocol {
     }
     
     func getMessages(isLastRequestSuccessful: Bool) {
-        chatModel?.getMessages(isLastRequestSuccessful: isLastRequestSuccessful, completed: { [weak chatViewController] messages in
+        chatModel?.getMessages(isLastRequestSuccessful: isLastRequestSuccessful) { [weak chatViewController] messages in
             DispatchQueue.main.async {
                 var messageModelArray: [MessageModel] = []
                 guard let messages = messages?.result else {
@@ -64,6 +67,6 @@ extension ChatPresenter: ChatPresenterProtocol {
                 }
                 chatViewController?.updateMessages(messageModelArray)
             }
-        })
+        }
     }
 }

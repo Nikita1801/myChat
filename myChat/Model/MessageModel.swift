@@ -5,7 +5,7 @@
 //  Created by Никита Макаревич on 15.09.2022.
 //
 
-import Foundation
+import UIKit
 
 struct MessageModel {
     let message: String

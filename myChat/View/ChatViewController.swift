@@ -39,14 +39,12 @@ final class ChatViewController: UIViewController {
         chatPresenter = ChatPresenter(chatViewController: self)
         let outcomeMessages = chatPresenter?.fetchOutcomeMessages()
         guard let outcomeMessages = outcomeMessages else { return }
-        for message in outcomeMessages  {
-            messageModelArray.append(message)
-        }
+        messageModelArray = outcomeMessages
         
         getMessages()
         configureView()
     }
-
+    
     
     private let headerLabel: UILabel = {
         let label = UILabel()
@@ -91,7 +89,9 @@ extension ChatViewController: UITextFieldDelegate {
     
     /// Append send message to main array and clean textFiled line
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        let outcomeMessage = MessageModel(message: textField.text ?? "", photoURL: outcomeImageURL, isIncoming: false)
+        let outcomeMessage = MessageModel(message: textField.text ?? "",
+                                          photoURL: outcomeImageURL,
+                                          isIncoming: false)
         messageModelArray.append(outcomeMessage)
         chatTableView.reloadData()
         scrollToBottom(animated: true, indexPath: messageModelArray.count-1)
@@ -166,12 +166,15 @@ private extension ChatViewController {
     /// Show alert when getting error from the server
     func showAlert() {
         // create the alert
-        let alert = UIAlertController(title: "Ошибка при загрузке", message: "Желаете повторить загрузку?", preferredStyle: UIAlertController.Style.alert)
+        let alert = UIAlertController(title: "Ошибка при загрузке",
+                                      message: "Желаете повторить загрузку?",
+                                      preferredStyle: UIAlertController.Style.alert)
         
         // add the actions (buttons)
-        alert.addAction(UIAlertAction(title: "Повтроить загрузку", style: UIAlertAction.Style.default, handler: { _ in
-            self.chatPresenter?.getMessages(isLastRequestSuccessful: false)
-        } ))
+        let checkForSuccess: ()? = self.chatPresenter?.getMessages(isLastRequestSuccessful: false)
+        alert.addAction(UIAlertAction(title: "Повтроить загрузку",
+                                      style: UIAlertAction.Style.default,
+                                      handler: { _ in checkForSuccess } ))
         alert.addAction(UIAlertAction(title: "Закрыть", style: UIAlertAction.Style.cancel, handler: nil))
         // show the alert
         self.present(alert, animated: true, completion: nil)
@@ -195,12 +198,15 @@ extension ChatViewController: ChatViewControllerProtocol {
             showAlert()
             return
         }
-        for message in messages {
+        
+        messages.forEach { message in
             messageModelArray.insert(message, at: 0)
         }
         
         chatTableView.tableHeaderView = nil
-        if fetchingMoreData && messages.count != 0 && messageModelArray.count > 28 {
+        if fetchingMoreData,
+           messages.count != 0,
+           messageModelArray.count > 28 {
             chatTableView.reloadData()
             
             UIView.transition(with: chatTableView,
@@ -211,7 +217,7 @@ extension ChatViewController: ChatViewControllerProtocol {
                 self.fetchingMoreData = false
             }
         }
-        else if !fetchingMoreData && messages.count != 0 {
+        else if !fetchingMoreData, messages.count != 0 {
             chatTableView.reloadData()
             UIView.transition(with: chatTableView,
                               duration: 0.25,
@@ -225,13 +231,12 @@ extension ChatViewController: UIScrollViewDelegate {
     /// Detect end of message list and request more data
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let position = scrollView.contentOffset.y
-        if position < -20 {
-            if !fetchingMoreData {
-                chatTableView.tableHeaderView = createSpinner()
-                fetchingMoreData = true
-                chatPresenter?.getMessages(isLastRequestSuccessful: true)
-            }
-        }
+        guard position < -20, !fetchingMoreData else { return }
+
+        chatTableView.tableHeaderView = createSpinner()
+        fetchingMoreData = true
+        chatPresenter?.getMessages(isLastRequestSuccessful: true)
+        
     }
 }
 
