@@ -171,10 +171,10 @@ private extension ChatViewController {
                                       preferredStyle: UIAlertController.Style.alert)
         
         // add the actions (buttons)
-        let checkForSuccess: ()? = self.chatPresenter?.getMessages(isLastRequestSuccessful: false)
         alert.addAction(UIAlertAction(title: "Повтроить загрузку",
                                       style: UIAlertAction.Style.default,
-                                      handler: { _ in checkForSuccess } ))
+                                      handler: { _ in
+            self.chatPresenter?.getMessages(isLastRequestSuccessful: false) } ))
         alert.addAction(UIAlertAction(title: "Закрыть", style: UIAlertAction.Style.cancel, handler: nil))
         // show the alert
         self.present(alert, animated: true, completion: nil)
