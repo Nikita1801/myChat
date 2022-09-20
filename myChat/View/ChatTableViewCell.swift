@@ -12,12 +12,13 @@ final class ChatTableViewCell: UITableViewCell {
     private var incomeMessageConstraint: [NSLayoutConstraint] = []
     private var outcomeMessageConstraint: [NSLayoutConstraint] = []
     
-    var message: MessageModel! {
+    var message: MessageModel? {
         didSet {
-            bubbleBackgroundView.backgroundColor = message.isIncoming ? UIColor(named: "bubble") : UIColor(named: "outcomeBubble")
-            messageBody.textColor = message.isIncoming ? UIColor(named: "textColor") : .white
+            guard let incommingMessage = message?.isIncoming else { return }
+            bubbleBackgroundView.backgroundColor = incommingMessage ? UIColor(named: "bubble") : UIColor(named: "outcomeBubble")
+            messageBody.textColor = incommingMessage ? UIColor(named: "textColor") : .white
             
-            if message.isIncoming {
+            if incommingMessage {
                 NSLayoutConstraint.activate(incomeMessageConstraint)
                 NSLayoutConstraint.deactivate(outcomeMessageConstraint)
             }
